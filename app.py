@@ -14,6 +14,14 @@ def get_db():
     db.commit()
     return db, cursor
 
+def generate_str(length=1):
+    return "".join(random.choice(string.ascii_lowercase) for i in range(length))
+
+def get_short_url_from_db(cursor, short_url):
+    cursor.execute("SELECT * FROM urls where short_url= ?", (short_url,))
+    return cursor.fetchone()
+
+
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_db', None)
@@ -29,17 +37,15 @@ def index():
         short_url = data['shortUrl']
         long_url = data['longUrl']
         if len(short_url) == 0:
-            short_url = "".join(random.choice(string.ascii_lowercase) for i in range(6))
-        c.execute("SELECT * FROM urls where short_url= ?", (short_url,))
-        result = c.fetchone()
-        if result is None:
-            c.execute("INSERt INTO urls VALUES(?,?)", (long_url, short_url))
-            db.commit()
-            return jsonify(url="http://127.0.0.1:5000/"+short_url)
-        else:
-            pass
-            #Todo handle case where there the short url is already in the db
-
+            short_url = generate_str()
+        result = get_short_url_from_db(c,short_url)
+        while result != None:
+            short_url += generate_str()
+            result = get_short_url_from_db(c,short_url)
+        c.execute("INSERt INTO urls VALUES(?,?)", (long_url, short_url))
+        db.commit()
+        return jsonify(url="http://127.0.0.1:5000/"+short_url)
+    
     return render_template('index.html')
 
 
@@ -48,10 +54,10 @@ def getLongUrl(name):
     data = request.get_json()
     db, c = get_db()
     short_url = str(name)
-    c.execute("SELECT long_url FROM urls where short_url= ?", (short_url,))
-    result = c.fetchone()
+    result = get_short_url_from_db(c,short_url)
     if result is None:
-        return jsonify(error="No such URL in our database")
+        error = "Sorry, no such URL in our database."
+        return render_template('index.html', error=error)
     return redirect(result[0])
 
 

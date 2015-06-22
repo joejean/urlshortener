@@ -2,16 +2,19 @@
 
 {% block content%}
 
-<div class="container">
-
 <nav class="navbar navbar-inverse">
 <div class="container-fluid">
-    <div class="navbar-header">
+    <div class="navbar-heade">
       <p class="navbar-brand"> URL Shortener
       </p>
     </div>
 </div>
 </nav>
+
+<div class="container">
+{%if error%}
+    <p class="alert alert-danger">{{error}}</p>
+{% endif %}
 
 <div class="row jumbotron" data-bind="visible: resultUrl().length > 0">
         Your Shortened URL is: <span data-bind="text: resultUrl"></span>
