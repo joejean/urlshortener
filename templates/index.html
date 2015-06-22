@@ -12,11 +12,15 @@
 </nav>
 
 <div class="container">
+
 {%if error%}
-    <p class="alert alert-danger">{{error}}</p>
+    <div class="alert alert-danger">
+        <p>{{error}}</p>
+    </div>
+    
 {% endif %}
 
-<div class="row jumbotron" data-bind="visible: resultUrl().length > 0">
+<div class="row alert alert-success" data-bind="visible: resultUrl().length > 0">
         Your Shortened URL is: <span data-bind="text: resultUrl"></span>
 </div>
 
