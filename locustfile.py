@@ -1,4 +1,4 @@
-import random, string
+import random, string, json
 from locust import HttpLocust, TaskSet, task
 
 def generate_str(length=1):
@@ -7,14 +7,14 @@ def generate_str(length=1):
 class UserBehavior(TaskSet):
     @task(2)
     def submit_url_1(self):
-        self.client.post("/", {"longUrl":"https://www.youtube.com/results?search_query=2015+songs+playlist"})
+        self.client.post("/", json={"longUrl":"https://www.youtube.com/results?search_query=2015+songs+playlist", "shortUrl":""})
     @task(1)
     def index(self):
         self.client.get("/")
 
     @task(3)
     def submit_url_2(self):
-        self.client.post("/",{"longUrl":"https://screen.yahoo.com/live/event/edc-3", "shortUrl":"a"})
+        self.client.post("/",json={"longUrl":"https://screen.yahoo.com/live/event/edc-3", "shortUrl":"a"})
 
     @task(2)
     def get_url(self):
